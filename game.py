@@ -13,7 +13,10 @@ clock = pygame.time.Clock()
 
 background = pygame.transform.scale(pygame.image.load("assets/level/background.png").convert(), (WIDTH, HEIGHT))
 
-player = Player(size=2.5, speed=7)
+
+
+player = Player(size=2.5, speed=7, w=21, h=61)
+
 
 while True:
     keys = pygame.key.get_pressed()
@@ -22,7 +25,10 @@ while True:
             pygame.quit()
             exit()
     screen.blit(background, (0, 0))
-    screen.blit(player.image, player.pos)
+    screen.blit(player.image, player.hitbox)
     player.move()
+    if player.shoot_cooldown > 0:
+        player.shoot_cooldown -= 1
+    pygame.draw.rect(screen, "red", player.hitbox, width=2)
     pygame.display.update()
     clock.tick(FPS)
