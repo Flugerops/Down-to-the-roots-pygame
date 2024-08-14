@@ -2,6 +2,7 @@ import pygame
 from sys import exit
 from settings import WIDTH, HEIGHT, FPS
 from entities import Player
+from layer import all_sprites_group, bullet_group
 
 
 pygame.init()
@@ -16,6 +17,7 @@ background = pygame.transform.scale(pygame.image.load("assets/level/background.p
 
 
 player = Player(size=2.5, speed=7, w=21, h=61)
+all_sprites_group.add(player)
 
 
 while True:
@@ -25,10 +27,9 @@ while True:
             pygame.quit()
             exit()
     screen.blit(background, (0, 0))
-    screen.blit(player.image, player.hitbox)
-    player.move()
-    if player.shoot_cooldown > 0:
-        player.shoot_cooldown -= 1
-    pygame.draw.rect(screen, "red", player.hitbox, width=2)
+    # screen.blit(player.mask_image, (0,0))
+    all_sprites_group.draw(screen)
+    all_sprites_group.update()
+    pygame.draw.rect(screen, "red", player.rect, width=2)
     pygame.display.update()
     clock.tick(FPS)
