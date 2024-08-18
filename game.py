@@ -17,12 +17,10 @@ clock = pygame.time.Clock()
 background = pygame.image.load("assets/level/ground.png").convert()
 
 
-player = Player(size=2.5, speed=7, w=21, h=61)
+player = Player(size=2.5, speed=7, w=64, h=61)
 camera = Camera(background)
 
 all_sprites_group.add(player)
-
-
 
 while True:
     keys = pygame.key.get_pressed()
