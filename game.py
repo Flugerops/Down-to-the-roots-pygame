@@ -9,6 +9,7 @@ from layer import all_sprites_group, bullet_group, Camera
 
 pygame.init()
 
+#TODO REMEMBER THAT TO GET SPAWN POS YOU NEED TO DIVIDE WIDTH AND HEIGHT BY 2 WIDTH // 2 HEIGHT // 2
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Down to the roots")
@@ -30,7 +31,7 @@ while True:
             exit()
     # all_sprites_group.draw(screen)
     camera.custom_draw(player=player, screen=screen)
-    
+    player.handle_weapons(screen)
     all_sprites_group.update()   
     # screen.blit(background, (0, 0))
     # screen.blit(player.mask_image, (0,0))

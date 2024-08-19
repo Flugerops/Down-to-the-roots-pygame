@@ -1,4 +1,4 @@
-from math import sqrt, degrees, atan2
+from math import sqrt, degrees, atan2, pi
 from pygame import sprite, image, Vector2, transform, key, K_w, K_s, K_d, K_a, Rect, mouse, mask, KEYUP, draw
 from settings import WIDTH, HEIGHT
 from layer import Spritesheet, bullet_group, all_sprites_group
@@ -14,6 +14,9 @@ class Player(sprite.Sprite):
         self.w = w
         self.h = h
         self.size = size
+        self.weapon_img = image.load("assets/weapons/2_1.png").convert()
+        self.weapon_img = transform.rotozoom(self.weapon_img, 0, size)
+        self.weapon_img.set_colorkey((0,0,0))
         self.image = self.idle.get_image(4, w, h, size, (0,0,0))
         self.pos = Vector2(WIDTH, HEIGHT)
         self.speed = speed
@@ -64,6 +67,23 @@ class Player(sprite.Sprite):
         self.pos += Vector2(self.velocity_x, self.velocity_y)
         self.rect.center = self.pos
 
+    
+    # def handle_weapons(self, screen):
+    #     mouse_x, mouse_y = mouse.get_pos()
+    #     rel_x, rel_y = mouse_x - self.pos.x, mouse_y - self.pos.y
+    #     angle = (180 / pi) * -atan2(rel_y, rel_x)
+    #     offset_x = self.rect.centerx - WIDTH // 2
+    #     offset_y = self.rect.centery - HEIGHT // 2
+    #     self.get_mouse_pos()
+    #     weapon_copy = transform.rotate(self.weapon_img, angle + self.angle)
+    #     screen.blit(weapon_copy, (offset_x+15-int(weapon_copy.get_width()/2), offset_y+25-int(weapon_copy.get_height()/2)))        
+        
+    def handle_weapons(self, screen):
+        self.get_mouse_pos()
+        weapon_copy = transform.rotate(self.weapon_img, -self.angle)
+        offset_x = self.rect.centerx - WIDTH // 2
+        offset_y = self.rect.centery - HEIGHT // 2
+        screen.blit(weapon_copy, (self.rect.centerx - offset_x, self.rect.centery - offset_y))
     
     def get_mouse_pos(self):
         self.mouse_coords = mouse.get_pos()
