@@ -4,3 +4,4 @@ from pygame.sprite import Group
 
 all_sprites_group = Group()
 bullet_group = Group()
+enemy_group = Group()

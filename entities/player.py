@@ -1,5 +1,5 @@
 from math import sqrt, degrees, atan2
-from pygame import sprite, image, Vector2, transform, key, K_w, K_s, K_d, K_a, Rect, mouse, mask, KEYUP
+from pygame import sprite, image, Vector2, transform, key, K_w, K_s, K_d, K_a, Rect, mouse, mask, KEYUP, draw
 from settings import WIDTH, HEIGHT
 from layer import Spritesheet, bullet_group, all_sprites_group
 from .bullet import Bullet
@@ -8,7 +8,7 @@ from .bullet import Bullet
 
 class Player(sprite.Sprite):
     def __init__(self, size: float, speed: float, w: int, h: int) -> None:
-        super().__init__()
+        super().__init__(all_sprites_group)
         self.idle = Spritesheet(image.load("assets/player/Thin.png").convert_alpha(), 1, 300)
         self.run = Spritesheet(image.load("assets/player/Run.png").convert_alpha(), 1, 50)
         self.w = w
@@ -76,7 +76,7 @@ class Player(sprite.Sprite):
             self.shoot_cooldown = 20
             bullet_pos = self.pos
             self.get_mouse_pos()
-            self.bullet = Bullet(bullet_pos[0], bullet_pos[1], 50, self.angle, 500)
+            self.bullet = Bullet(bullet_pos[0], bullet_pos[1], 50, self.angle, 500, damage=20)
             bullet_group.add(self.bullet)
             all_sprites_group.add(self.bullet)
             

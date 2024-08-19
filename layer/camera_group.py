@@ -1,4 +1,4 @@
-from pygame import sprite, display, image, math, Vector2
+from pygame import sprite, display, image, math, Vector2, draw
 from settings import WIDTH, HEIGHT
 from layer import all_sprites_group
 
@@ -15,7 +15,6 @@ class Camera(sprite.Group):
         self.offset.y = player.rect.centery - HEIGHT // 2
         floor_offset_pos = self.floor_rect.topleft - self.offset
         screen.blit(self.background, floor_offset_pos)
-
         for sprite in all_sprites_group:
             offset_pos = sprite.rect.topleft - self.offset
             screen.blit(sprite.image, offset_pos)
