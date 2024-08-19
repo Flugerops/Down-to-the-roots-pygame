@@ -1,14 +1,15 @@
-from pygame import sprite, image, Vector2
+from pygame import sprite, image, Vector2, transform
 from layer import all_sprites_group, enemy_group, Spritesheet
 
 
 class Enemy(sprite.Sprite):
-    def __init__(self, pos, size: float, speed: float, w: int, h: int, health, player) -> None:
+    def __init__(self, pos, size: float, speed: float, w: int, h: int, health, player, fliped: bool) -> None:
         super().__init__(all_sprites_group, enemy_group)
         self.enemy_sprite = Spritesheet(image.load("assets/enemies/hound_run.png").convert_alpha(), 1, 300)
         self.image = self.enemy_sprite.get_image(1, w, h, size, (0,0,0))
         self.rect = self.image.get_rect(center=pos)
         self.alive = True
+        self.flipped = fliped
         self.health = health
         self.player = player
         self.direction = Vector2()
@@ -41,4 +42,14 @@ class Enemy(sprite.Sprite):
         return (vector1 - vector2).magnitude()
         
     def update(self):
+        if not self.flipped and self.velocity.x < 0:
+            self.image = transform.flip(self.image, True, False)
+            self.image.set_colorkey((0,0,0))
+            self.flipped = True
+            
+        elif self.flipped and self.velocity.x > 0:
+            self.image = transform.flip(self.image, True, False)
+            self.image.set_colorkey((0,0,0))
+            self.flipped = False
+        
         self.chase_player(self.player)

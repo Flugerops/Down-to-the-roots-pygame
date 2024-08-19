@@ -18,7 +18,7 @@ background = pygame.image.load("assets/level/ground.png").convert()
 
 
 player = Player(size=2.5, speed=7, w=64, h=61)
-enemy = Enemy(pos=(500,600), size=2.5, speed=5, w=67, h=32, player=player, health=100)
+enemy = Enemy(pos=(500,600), size=2.5, speed=5, w=67, h=32, player=player, health=100, fliped=True)
 camera = Camera(background)
 
 
