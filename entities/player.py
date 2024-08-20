@@ -80,13 +80,13 @@ class Player(sprite.Sprite):
         
     def handle_weapons(self, screen):
         self.get_mouse_pos()
-        weapon_copy = transform.rotate(self.weapon_img, -self.angle)
-        offset_x = self.rect.centerx - WIDTH // 2
-        offset_y = self.rect.centery - HEIGHT // 2 + 20
-        if self.x_changed_mouse < 0:
-            weapon_copy = transform.flip(weapon_copy, False, True)
-            weapon_copy = transform.rotate(weapon_copy, self.angle)
-            
+        if self.angle < -90 or self.angle > 90:
+            weapon_copy = transform.flip(self.weapon_img, False, True)
+            weapon_copy = transform.rotate(weapon_copy, -self.angle)
+        else:
+            weapon_copy = transform.rotate(self.weapon_img, -self.angle)
+        offset_x = self.rect.centerx - WIDTH // 2 + 10
+        offset_y = self.rect.centery - HEIGHT // 2 + 5
         screen.blit(weapon_copy, (self.rect.centerx - offset_x, self.rect.centery - offset_y))
     
     def get_mouse_pos(self):
