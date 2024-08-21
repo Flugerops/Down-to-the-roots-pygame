@@ -1,7 +1,7 @@
 from math import sqrt, degrees, atan2, pi
 from pygame import sprite, image, Vector2, transform, key, K_w, K_s, K_d, K_a, Rect, mouse, mask, KEYUP, draw
 from settings import WIDTH, HEIGHT
-from layer import Spritesheet, bullet_group, all_sprites_group
+from layer import Spritesheet, bullet_group, all_sprites_group, obstacles
 from .bullet import Bullet
 
 
@@ -32,24 +32,28 @@ class Player(sprite.Sprite):
     def move(self):
         keys = key.get_pressed()
         if keys[K_w]:
-            self.velocity_y = -self.speed
-            self.running = True
+            if self.obstacle_check(0, -self.speed):
+                self.velocity_y = -self.speed
+                self.running = True
             
         if keys[K_s]:
-            self.velocity_y = self.speed
-            self.running = True
+            if self.obstacle_check(0, self.speed):
+                self.velocity_y = self.speed
+                self.running = True
             
         if keys[K_d]:
-            self.velocity_x = self.speed
-            self.running = True
-            if self.flipped:
-                self.flipped = False
+            if self.obstacle_check(self.speed, 0):
+                self.velocity_x = self.speed
+                self.running = True
+                if self.flipped:
+                    self.flipped = False
                 
         if keys[K_a]:
-            self.velocity_x = -self.speed
-            self.running = True
-            if not self.flipped:
-                self.flipped = True
+            if self.obstacle_check(-self.speed, 0):
+                self.velocity_x = -self.speed
+                self.running = True
+                if not self.flipped:
+                    self.flipped = True
         
         if not all([keys[K_a] or keys[K_d] or keys[K_s] or keys[K_w]]):
             self.running = False
@@ -63,20 +67,20 @@ class Player(sprite.Sprite):
         if self.velocity_x != 0 and self.velocity_y != 0:
             self.velocity_x /= sqrt(2)
             self.velocity_y /= sqrt(2)
-        
+         
         self.pos += Vector2(self.velocity_x, self.velocity_y)
+        
+        if self.pos.x < 0:
+            self.pos.x = 0
+        elif self.pos.x > 4000 - self.w:
+            self.pos.x = 4000 - self.w
+        if self.pos.y < 0:
+            self.pos.y = 0
+        elif self.pos.y > 2500 - self.h:
+            self.pos.y = 2500 - self.h
+            
         self.rect.center = self.pos
 
-    
-    # def handle_weapons(self, screen):
-    #     mouse_x, mouse_y = mouse.get_pos()
-    #     rel_x, rel_y = mouse_x - self.pos.x, mouse_y - self.pos.y
-    #     angle = (180 / pi) * -atan2(rel_y, rel_x)
-    #     offset_x = self.rect.centerx - WIDTH // 2
-    #     offset_y = self.rect.centery - HEIGHT // 2
-    #     self.get_mouse_pos()
-    #     weapon_copy = transform.rotate(self.weapon_img, angle + self.angle)
-    #     screen.blit(weapon_copy, (offset_x+15-int(weapon_copy.get_width()/2), offset_y+25-int(weapon_copy.get_height()/2)))        
         
     def handle_weapons(self, screen):
         self.get_mouse_pos()
@@ -89,6 +93,15 @@ class Player(sprite.Sprite):
         offset_y = self.rect.centery - HEIGHT // 2 + 5
         screen.blit(weapon_copy, (self.rect.centerx - offset_x, self.rect.centery - offset_y))
     
+
+    def obstacle_check(self, dx, dy):
+        new_pos = self.pos + Vector2(dx, dy)
+        for sprite in obstacles:
+            if new_pos.x + self.w > sprite.hitbox.left and new_pos.x < sprite.hitbox.right and new_pos.y + self.h > sprite.hitbox.top and new_pos.y < sprite.hitbox.bottom:
+                self.pos -= Vector2(dx, dy)
+                return False
+        return True
+            
     def get_mouse_pos(self):
         self.mouse_coords = mouse.get_pos()
         self.x_changed_mouse = (self.mouse_coords[0] - WIDTH // 2)

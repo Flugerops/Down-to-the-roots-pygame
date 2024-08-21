@@ -6,7 +6,7 @@ from layer import enemy_group
 class Bullet(sprite.Sprite):
     def __init__(self, x, y, speed, angle, lifetime, damage) -> None:
         super().__init__()
-        self.image = transform.rotozoom(image.load("assets/effects/white_bullet.png").convert_alpha(), 0, 1.4)
+        self.image = transform.rotozoom(image.load("assets/effects/white_bullet.png").convert_alpha(), 0, 2)
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.x = x

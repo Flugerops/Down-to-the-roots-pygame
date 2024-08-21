@@ -1,4 +1,4 @@
-from pygame import sprite, display, image, math, Vector2, draw
+from pygame import sprite, display, image, math, Vector2, draw, transform
 from settings import WIDTH, HEIGHT
 from layer import all_sprites_group
 
@@ -9,8 +9,10 @@ class Camera(sprite.Group):
         self.offset = Vector2()
         self.background = background
         self.floor_rect = background.get_rect(topleft = (0, 0))
+        self.large_bg = transform.scale(image.load("assets/level/hell_bg.png").convert(), (2500, 1500))
 
     def custom_draw(self, player, screen):
+        screen.blit(self.large_bg, (0, 0))
         self.offset.x = player.rect.centerx - WIDTH // 2
         self.offset.y = player.rect.centery - HEIGHT // 2
         floor_offset_pos = self.floor_rect.topleft - self.offset
