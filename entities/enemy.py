@@ -3,19 +3,21 @@ from layer import all_sprites_group, enemy_group, Spritesheet, obstacles
 
 
 class Enemy(sprite.Sprite):
-    def __init__(self, pos, size: float, speed: float, w: int, h: int, health, damage, player, fliped: bool) -> None:
+    def __init__(self, pos, size: float, speed: float, w: int, h: int, health, damage, player, fliped: bool, exp, on_death=None) -> None:
         super().__init__(all_sprites_group, enemy_group)
         self.enemy_sprite = Spritesheet(image.load("assets/enemies/hound_run.png").convert_alpha(), 1, 300)
         self.image = self.enemy_sprite.get_image(1, w, h, size, (0,0,0))
         self.rect = self.image.get_rect(center=pos)
         self.alive = True
         self.flipped = fliped
+        self.exp = exp
         self.health = health * (1 + player.level * 0.1)
         self.damage = damage * (1 + player.level * 0.1)
         self.player = player
         self.direction = Vector2()
         self.velocity = Vector2()
         self.speed = speed
+        self.on_death = on_death
         self.position = Vector2(pos)
         
 
@@ -37,6 +39,13 @@ class Enemy(sprite.Sprite):
                 self.velocity = avoid_direction * self.speed
                 break
         
+        if self.rect.colliderect(player.rect):
+            player.get_damage(self.damage)
+            self.velocity = -self.velocity * 5
+            self.position += self.velocity * 10
+            self.rect.centerx = self.position.x
+            self.rect.centery = self.position.y   
+        
         
         self.position += self.velocity
         self.rect.centerx = self.position.x
@@ -47,6 +56,8 @@ class Enemy(sprite.Sprite):
         if self.health <= 0:
             self.alive = False
             self.kill()
+            self.on_death()
+            self.player.gain_exp(self.exp)
     
     def avoid_obstacle(self, obstacle):
         avoid_direction = (self.position - obstacle.hitbox.center).normalize()

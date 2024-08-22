@@ -29,6 +29,7 @@ class Player(sprite.Sprite):
         self.velocity_y = 0
         self.level = 5
         self.experience = 0
+        self.exp_to_next_level = 100
         self.skill_points = 5
         self.strength = 0
         self.agility = 0
@@ -38,6 +39,8 @@ class Player(sprite.Sprite):
         self.damage = 25
         self.speed_multiplayer = 1
         self.points_cooldown = 0
+        self.damage_cooldown = 0
+        self.dead = False
         
     def move(self):
         keys = key.get_pressed()
@@ -118,6 +121,12 @@ class Player(sprite.Sprite):
         self.experience = 0
         self.skill_points += 1
 
+    def gain_exp(self, amount):
+        self.experience += amount
+        if self.experience >= self.exp_to_next_level:
+            self.level_up()
+            self.exp_to_next_level *= 2
+    
     def spend_skill_point(self, attribute):
         if self.skill_points > 0:
             match attribute:
@@ -132,6 +141,13 @@ class Player(sprite.Sprite):
                     self.intelligence += 1
             self.skill_points -= 1
             print(self.agility)
+    
+    def get_damage(self, amount):
+        if self.damage_cooldown == 0:
+            self.health -= amount
+            if self.health <= 0:
+                self.dead = True
+            self.damage_cooldown = 20
     
     def obstacle_check(self, dx, dy):
         new_pos = self.pos + Vector2(dx, dy)
@@ -177,3 +193,5 @@ class Player(sprite.Sprite):
             self.shooting()
         if self.points_cooldown > 0:
             self.points_cooldown -= 1
+        if self.damage_cooldown > 0:
+            self.damage_cooldown -= 1
