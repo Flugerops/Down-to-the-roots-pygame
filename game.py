@@ -37,7 +37,7 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
-    # all_sprites_group.draw(screen)
+    # all_sprites_group.draw(screen),
     camera.custom_draw(player=player, screen=screen)
     
     player.handle_weapons(screen)

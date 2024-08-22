@@ -1,6 +1,6 @@
 from math import sin, cos, pi, atan2, degrees
 from pygame import sprite, image, Vector2, transform, key, K_w, K_s, K_d, K_a, Rect, mouse, time
-from layer import enemy_group
+from layer import enemy_group, obstacles
 
 
 class Bullet(sprite.Sprite):
@@ -40,3 +40,7 @@ class Bullet(sprite.Sprite):
             for hit in hits:
                 hit.get_damage(self.damage)
                 self.kill()
+        for obstacle in obstacles:
+            if self.rect.colliderect(obstacle.hitbox):
+                self.kill()
+                break

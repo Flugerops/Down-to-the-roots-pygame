@@ -1,5 +1,5 @@
 from pygame import sprite, image, Vector2, transform
-from layer import all_sprites_group, enemy_group, Spritesheet
+from layer import all_sprites_group, enemy_group, Spritesheet, obstacles
 
 
 class Enemy(sprite.Sprite):
@@ -27,6 +27,14 @@ class Enemy(sprite.Sprite):
             self.direction = Vector2()
         
         self.velocity = self.direction * self.speed
+        
+        for obstacle in obstacles:
+            if self.rect.colliderect(obstacle.hitbox):
+                avoid_direction = self.avoid_obstacle(obstacle)
+                self.velocity = avoid_direction * self.speed
+                break
+        
+        
         self.position += self.velocity
         self.rect.centerx = self.position.x
         self.rect.centery = self.position.y
@@ -36,6 +44,11 @@ class Enemy(sprite.Sprite):
         if self.health <= 0:
             self.alive = False
             self.kill()
+    
+    def avoid_obstacle(self, obstacle):
+        avoid_direction = (self.position - obstacle.hitbox.center).normalize()
+        self.velocity += avoid_direction * (self.speed / 2)
+        return avoid_direction
     
     @staticmethod
     def vec_dist(vector1, vector2):
