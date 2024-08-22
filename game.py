@@ -3,7 +3,7 @@ from sys import exit
 from pygame.sprite import Group
 from settings import WIDTH, HEIGHT, FPS
 from entities import Player, Enemy
-from layer import all_sprites_group, bullet_group, Camera, SpriteGenerator, obstacles
+from layer import all_sprites_group, bullet_group, Camera, SpriteGenerator, obstacles, UI
 
 
 
@@ -27,9 +27,13 @@ tree_sprites.generate_sprites()
 stone_sprites = SpriteGenerator(stone2_img, 3)
 stone_sprites.generate_sprites()
 
+
 player = Player(size=2.5, speed=7, w=64, h=61)
-enemy = Enemy(pos=(500,600), size=2.5, speed=5, w=67, h=32, player=player, health=100, fliped=True)
+ui = UI(screen=screen)
+enemy = Enemy(pos=(500,600), size=2.5, speed=5, w=67, h=32, player=player, health=100, damage=20, fliped=True)
 camera = Camera(background)
+
+
 
 while True:
     keys = pygame.key.get_pressed()
@@ -42,6 +46,9 @@ while True:
     
     player.handle_weapons(screen)
     all_sprites_group.update()
+    ui.update(player=player)
+    
+    
     # for sprite in obstacles:
     #     pygame.draw.rect(screen, "red", sprite.hitbox, width=2)   
     # screen.blit(background, (0, 0))

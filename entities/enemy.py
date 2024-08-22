@@ -3,20 +3,23 @@ from layer import all_sprites_group, enemy_group, Spritesheet, obstacles
 
 
 class Enemy(sprite.Sprite):
-    def __init__(self, pos, size: float, speed: float, w: int, h: int, health, player, fliped: bool) -> None:
+    def __init__(self, pos, size: float, speed: float, w: int, h: int, health, damage, player, fliped: bool) -> None:
         super().__init__(all_sprites_group, enemy_group)
         self.enemy_sprite = Spritesheet(image.load("assets/enemies/hound_run.png").convert_alpha(), 1, 300)
         self.image = self.enemy_sprite.get_image(1, w, h, size, (0,0,0))
         self.rect = self.image.get_rect(center=pos)
         self.alive = True
         self.flipped = fliped
-        self.health = health
+        self.health = health * (1 + player.level * 0.1)
+        self.damage = damage * (1 + player.level * 0.1)
         self.player = player
         self.direction = Vector2()
         self.velocity = Vector2()
         self.speed = speed
         self.position = Vector2(pos)
         
+
+    
     def chase_player(self, player):
         player_vector = Vector2(player.rect.center)
         enemy_vector = Vector2(self.rect.center)

@@ -1,5 +1,5 @@
 from math import sqrt, degrees, atan2, pi
-from pygame import sprite, image, Vector2, transform, key, K_w, K_s, K_d, K_a, Rect, mouse, mask, KEYUP, draw
+from pygame import sprite, image, Vector2, transform, key, K_w, K_s, K_d, K_a, K_1, K_2, K_3, Rect, mouse, mask, KEYUP, draw
 from settings import WIDTH, HEIGHT
 from layer import Spritesheet, bullet_group, all_sprites_group, obstacles
 from .bullet import Bullet
@@ -27,33 +27,53 @@ class Player(sprite.Sprite):
         self.shoot_cooldown = 0
         self.velocity_x = 0
         self.velocity_y = 0
-        
+        self.level = 5
+        self.experience = 0
+        self.skill_points = 5
+        self.strength = 0
+        self.agility = 0
+        self.intelligence = 0
+        self.max_health = 100
+        self.health = 100
+        self.damage = 25
+        self.speed_multiplayer = 1
+        self.points_cooldown = 0
         
     def move(self):
         keys = key.get_pressed()
         if keys[K_w]:
-            if self.obstacle_check(0, -self.speed):
-                self.velocity_y = -self.speed
+            if self.obstacle_check(0, -self.speed * self.speed_multiplayer):
+                self.velocity_y = -self.speed * self.speed_multiplayer
                 self.running = True
             
         if keys[K_s]:
-            if self.obstacle_check(0, self.speed):
-                self.velocity_y = self.speed
+            if self.obstacle_check(0, self.speed * self.speed_multiplayer):
+                self.velocity_y = self.speed * self.speed_multiplayer
                 self.running = True
             
         if keys[K_d]:
-            if self.obstacle_check(self.speed, 0):
-                self.velocity_x = self.speed
+            if self.obstacle_check(self.speed * self.speed_multiplayer, 0):
+                self.velocity_x = self.speed * self.speed_multiplayer
                 self.running = True
                 if self.flipped:
                     self.flipped = False
                 
         if keys[K_a]:
-            if self.obstacle_check(-self.speed, 0):
-                self.velocity_x = -self.speed
+            if self.obstacle_check(-self.speed * self.speed_multiplayer, 0):
+                self.velocity_x = -self.speed * self.speed_multiplayer
                 self.running = True
                 if not self.flipped:
                     self.flipped = True
+        
+        if keys[K_1] and self.points_cooldown == 0:
+            self.spend_skill_point("strength")
+            self.points_cooldown = 30
+        if keys[K_2] and self.points_cooldown == 0:
+            self.spend_skill_point("agility")
+            self.points_cooldown = 30
+        if keys[K_3] and self.points_cooldown == 0:
+            self.spend_skill_point("intelligence")
+            self.points_cooldown = 30
         
         if not all([keys[K_a] or keys[K_d] or keys[K_s] or keys[K_w]]):
             self.running = False
@@ -93,7 +113,26 @@ class Player(sprite.Sprite):
         offset_y = self.rect.centery - HEIGHT // 2 + 5
         screen.blit(weapon_copy, (self.rect.centerx - offset_x, self.rect.centery - offset_y))
     
+    def level_up(self):
+        self.level += 1
+        self.experience = 0
+        self.skill_points += 1
 
+    def spend_skill_point(self, attribute):
+        if self.skill_points > 0:
+            match attribute:
+                case "strength":
+                    self.strength += 1
+                    self.max_health += 10
+                case "agility":
+                    self.agility += 1
+                    self.damage += 2
+                    self.speed_multiplayer += 0.05
+                case "intelligence":
+                    self.intelligence += 1
+            self.skill_points -= 1
+            print(self.agility)
+    
     def obstacle_check(self, dx, dy):
         new_pos = self.pos + Vector2(dx, dy)
         for sprite in obstacles:
@@ -113,7 +152,7 @@ class Player(sprite.Sprite):
             self.shoot_cooldown = 20
             bullet_pos = self.pos
             self.get_mouse_pos()
-            self.bullet = Bullet(bullet_pos[0], bullet_pos[1], 50, self.angle, 500, damage=20)
+            self.bullet = Bullet(bullet_pos[0], bullet_pos[1], 50, self.angle, 500, damage=self.damage)
             bullet_group.add(self.bullet)
             all_sprites_group.add(self.bullet)
             
@@ -136,3 +175,5 @@ class Player(sprite.Sprite):
             self.shoot_cooldown -= 1
         if self.shoot:
             self.shooting()
+        if self.points_cooldown > 0:
+            self.points_cooldown -= 1
