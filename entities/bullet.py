@@ -1,5 +1,5 @@
 from math import sin, cos, pi, atan2, degrees
-from pygame import sprite, image, Vector2, transform, key, K_w, K_s, K_d, K_a, Rect, mouse, time
+from pygame import sprite, image, Vector2, transform, key, K_w, K_s, K_d, K_a, Rect, mouse, time, mixer
 from layer import enemy_group, obstacles
 
 

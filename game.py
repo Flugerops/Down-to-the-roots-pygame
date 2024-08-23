@@ -10,6 +10,7 @@ from layer import all_sprites_group, bullet_group, Camera, SpriteGenerator, obst
 class Game:
     def __init__(self):
         pygame.init()
+        self.font = pygame.font.Font(None, 36)
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption("Down to the roots")
         self.clock = pygame.time.Clock()
@@ -31,6 +32,11 @@ class Game:
         self.enemy_wave = 1
         self.enemies_per_wave = 5
         self.living_enemies = 0
+        self.running = True
+        self.background_music = pygame.mixer.Sound("assets/sounds/background_music.mp3")
+        self.background_music.play(-1)
+        self.background_music.set_volume(0.3)
+        self.wave_sound = pygame.mixer.Sound("assets/sounds/new_wave.mp3")
 
     def enemy_kill(enemy):
         game.living_enemies -= 1
@@ -39,7 +45,8 @@ class Game:
         hound_image = pygame.image.load("assets/enemies/hound_run.png")
         armored_skeleton = pygame.image.load(
             "assets/enemies/armored_skeleton.png")
-        shield_skeleton = pygame.image.load("assets/enemies/shield_skeleton.png")
+        shield_skeleton = pygame.image.load(
+            "assets/enemies/shield_skeleton.png")
         for i in range(self.enemies_per_wave):
             enemy_type = randint(0, 2)
             if enemy_type == 0:
@@ -54,12 +61,29 @@ class Game:
 
         self.living_enemies = self.enemies_per_wave
 
+    def game_over(self):
+        self.background_music.stop()
+        text = self.font.render("Game Over", True, (255, 255, 255))
+        waves_text = self.font.render(
+            f"Survived for {self.enemy_wave} wave", True, (255, 255, 255))
+        text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2 - 50))
+        waves_rect = waves_text.get_rect(center=(WIDTH/2, HEIGHT/2 + 20))
+
+        for sprite in all_sprites_group:
+            sprite.kill()
+
+        self.screen.fill((0, 0, 0))
+        self.screen.blit(text, text_rect)
+        self.screen.blit(waves_text, waves_rect)
+
     def update(self):
         keys = pygame.key.get_pressed()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+                self.running = False
                 exit()
+
         self.camera.custom_draw(player=self.player, screen=self.screen)
         self.player.handle_weapons(self.screen)
         all_sprites_group.update()
@@ -67,13 +91,15 @@ class Game:
         if self.living_enemies == 0:
             self.enemy_wave += 1
             self.enemies_per_wave += 2
+            self.wave_sound.play()
             self.spawn_enemies()
         if self.player.dead:
-            exit()
+            self.game_over()
 
     def run(self):
         self.spawn_enemies()
-        while True:
+        while self.running:
+
             self.update()
             pygame.display.update()
             self.clock.tick(FPS)

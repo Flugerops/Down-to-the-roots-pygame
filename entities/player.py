@@ -1,6 +1,6 @@
 from math import sqrt, degrees, atan2, pi
 from random import randint
-from pygame import sprite, image, Vector2, transform, key, K_w, K_s, K_d, K_a, K_1, K_2, K_3, K_q, K_r, K_e, Rect, mouse, mask, KEYUP, draw
+from pygame import sprite, image, Vector2, transform, key, K_w, K_s, K_d, K_a, K_1, K_2, K_3, K_q, K_r, K_e, Rect, mouse, mask, KEYUP, draw, mixer
 from settings import WIDTH, HEIGHT
 from layer import Spritesheet, bullet_group, all_sprites_group, obstacles, lightning_group
 from .bullet import Bullet
@@ -44,6 +44,9 @@ class Player(sprite.Sprite):
         self.points_cooldown = 0
         self.damage_cooldown = 0
         self.dead = False
+        self.bullet_sound = mixer.Sound("assets/sounds/bullet.mp3")
+        self.bullet_sound.set_volume(0.3)
+        self.hit_sound = mixer.Sound("assets/sounds/hit_sound.mp3")
         
     def move(self):
         keys = key.get_pressed()
@@ -150,6 +153,7 @@ class Player(sprite.Sprite):
                     bullet = Bullet(self.rect.centerx, self.rect.centery, 50, angle, 500, damage=self.damage)
                     bullet_group.add(bullet)
                     all_sprites_group.add(bullet)
+                    self.bullet_sound.play()
                 self.ability_cooldowns[key] = 1250
             case "r":
                 self.get_mouse_pos()
@@ -158,6 +162,8 @@ class Player(sprite.Sprite):
                 self.lightning = Lightning(mouse_x, mouse_y, self.intelligence)
                 lightning_group.add(self.lightning)
                 all_sprites_group.add(self.lightning)
+                lightning_sound = mixer.Sound("assets/sounds/lightning_strike.mp3")
+                lightning_sound.play()
                 self.ability_cooldowns[key] = 3600
             case "e":
                 heal_amount = self.intelligence * 5 + 10
@@ -165,6 +171,8 @@ class Player(sprite.Sprite):
                     self.health += heal_amount
                 else:
                     self.health = self.max_health
+                healsound = mixer.Sound("assets/sounds/healpop.mp3")
+                healsound.play()
                 self.ability_cooldowns[key] = 1800
 
     
@@ -193,6 +201,7 @@ class Player(sprite.Sprite):
             if self.health <= 0:
                 self.dead = True
             self.damage_cooldown = 20
+            self.hit_sound.play()
     
     def obstacle_check(self, dx, dy):
         new_pos = self.pos + Vector2(dx, dy)
@@ -214,6 +223,7 @@ class Player(sprite.Sprite):
             bullet_pos = self.pos
             self.get_mouse_pos()
             self.bullet = Bullet(bullet_pos[0], bullet_pos[1], 50, self.angle, 500, damage=self.damage)
+            self.bullet_sound.play()
             bullet_group.add(self.bullet)
             all_sprites_group.add(self.bullet)
             
