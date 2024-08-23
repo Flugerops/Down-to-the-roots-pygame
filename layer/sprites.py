@@ -5,6 +5,7 @@ from pygame.sprite import Group, Sprite
 
 all_sprites_group = Group()
 bullet_group = Group()
+lightning_group = Group()
 enemy_group = Group()
 obstacles = Group()
 

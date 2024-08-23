@@ -1,8 +1,10 @@
 from math import sqrt, degrees, atan2, pi
-from pygame import sprite, image, Vector2, transform, key, K_w, K_s, K_d, K_a, K_1, K_2, K_3, Rect, mouse, mask, KEYUP, draw
+from random import randint
+from pygame import sprite, image, Vector2, transform, key, K_w, K_s, K_d, K_a, K_1, K_2, K_3, K_q, K_r, K_e, Rect, mouse, mask, KEYUP, draw
 from settings import WIDTH, HEIGHT
-from layer import Spritesheet, bullet_group, all_sprites_group, obstacles
+from layer import Spritesheet, bullet_group, all_sprites_group, obstacles, lightning_group
 from .bullet import Bullet
+from .lightning import Lightning
 
 
 
@@ -38,6 +40,7 @@ class Player(sprite.Sprite):
         self.health = 100
         self.damage = 25
         self.speed_multiplayer = 1
+        self.ability_cooldowns = {"q": 0, "e": 0, "r": 0}
         self.points_cooldown = 0
         self.damage_cooldown = 0
         self.dead = False
@@ -77,6 +80,17 @@ class Player(sprite.Sprite):
         if keys[K_3] and self.points_cooldown == 0:
             self.spend_skill_point("intelligence")
             self.points_cooldown = 30
+        
+        if keys[K_q] and self.ability_cooldowns.get("q") == 0:
+            self.use_ability("q")
+        
+        if keys[K_e] and self.ability_cooldowns.get("e") == 0:
+            self.use_ability("e")
+        
+        if keys[K_r] and self.ability_cooldowns.get("r") == 0:
+            self.use_ability("r")
+            
+            
         
         if not all([keys[K_a] or keys[K_d] or keys[K_s] or keys[K_w]]):
             self.running = False
@@ -125,14 +139,46 @@ class Player(sprite.Sprite):
         self.experience += amount
         if self.experience >= self.exp_to_next_level:
             self.level_up()
-            self.exp_to_next_level *= 2
+            self.exp_to_next_level *= 1.5
+    
+    def use_ability(self, key):
+        match key:
+            case "q":
+                num_bullets = self.intelligence * 2 + 5
+                for i in range(num_bullets):
+                    angle = self.angle + randint(-10, 10)
+                    bullet = Bullet(self.rect.centerx, self.rect.centery, 50, angle, 500, damage=self.damage)
+                    bullet_group.add(bullet)
+                    all_sprites_group.add(bullet)
+                self.ability_cooldowns[key] = 1250
+            case "r":
+                self.get_mouse_pos()
+                mouse_x = self.pos.x + self.x_changed_mouse
+                mouse_y = self.pos.y + self.y_changed_mouse
+                self.lightning = Lightning(mouse_x, mouse_y, self.intelligence)
+                lightning_group.add(self.lightning)
+                all_sprites_group.add(self.lightning)
+                self.ability_cooldowns[key] = 3600
+            case "e":
+                heal_amount = self.intelligence * 5 + 10
+                if self.health + heal_amount <= self.max_health:
+                    self.health += heal_amount
+                else:
+                    self.health = self.max_health
+                self.ability_cooldowns[key] = 1800
+
     
     def spend_skill_point(self, attribute):
         if self.skill_points > 0:
             match attribute:
                 case "strength":
                     self.strength += 1
-                    self.max_health += 10
+                    if self.health == self.max_health:
+                        self.max_health += 10
+                        self.health = self.max_health
+                    else:
+                        self.max_health += 10
+                    
                 case "agility":
                     self.agility += 1
                     self.damage += 2
@@ -140,7 +186,6 @@ class Player(sprite.Sprite):
                 case "intelligence":
                     self.intelligence += 1
             self.skill_points -= 1
-            print(self.agility)
     
     def get_damage(self, amount):
         if self.damage_cooldown == 0:
@@ -195,3 +240,7 @@ class Player(sprite.Sprite):
             self.points_cooldown -= 1
         if self.damage_cooldown > 0:
             self.damage_cooldown -= 1
+            
+        for key in self.ability_cooldowns:
+            if self.ability_cooldowns[key] > 0:
+                self.ability_cooldowns[key] -= 1

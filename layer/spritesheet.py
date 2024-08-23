@@ -9,7 +9,6 @@ class Spritesheet:
         self.delay = delay
         self.last_frame_time = time.get_ticks()
         
-        
     def get_image(self, frame, width, height, scale, colour):
         image = Surface((width, height)).convert_alpha()
         image.blit(self.sheet, (0, 0), ((frame * width), 0, width, height))

@@ -13,8 +13,10 @@ class Game:
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption("Down to the roots")
         self.clock = pygame.time.Clock()
-        self.background = pygame.image.load("assets/level/test_level.png").convert()
-        self.stone1_img = pygame.image.load("assets/obstacles/stone1.png").convert()
+        self.background = pygame.image.load(
+            "assets/level/test_level.png").convert()
+        self.stone1_img = pygame.image.load(
+            "assets/obstacles/stone1.png").convert()
         self.tree_img = pygame.image.load("assets/obstacles/tree1.png")
         self.stone2_img = pygame.image.load("assets/obstacles/stone2.png")
         self.stone_sprites = SpriteGenerator(self.stone1_img, 20)
@@ -32,11 +34,24 @@ class Game:
 
     def enemy_kill(enemy):
         game.living_enemies -= 1
-    
+
     def spawn_enemies(self):
+        hound_image = pygame.image.load("assets/enemies/hound_run.png")
+        armored_skeleton = pygame.image.load(
+            "assets/enemies/armored_skeleton.png")
+        shield_skeleton = pygame.image.load("assets/enemies/shield_skeleton.png")
         for i in range(self.enemies_per_wave):
-            enemy = Enemy(pos=(randint(0, 4000 - 67), randint(0, 2500 - 32)), size=2.5, speed=5, w=67, h=32,
-                          player=self.player, health=100, damage=20, fliped=True, exp=randint(20, 80), on_death=self.enemy_kill)
+            enemy_type = randint(0, 2)
+            if enemy_type == 0:
+                enemy = Enemy(pos=(randint(0, 4000 - 67), randint(0, 2500 - 32)), size=2.5, speed=5, w=67, h=32, delay=50,
+                              player=self.player, health=100, damage=20, sheet=hound_image, exp=randint(20, 80)*self.enemy_wave, on_death=self.enemy_kill)
+            if enemy_type == 1:
+                enemy = Enemy(pos=(randint(0, 4000 - 67), randint(0, 2500 - 32)), size=2.5, speed=3, w=75, h=64, delay=100,
+                              player=self.player, health=250, damage=50, sheet=armored_skeleton, exp=randint(100, 300)*self.enemy_wave, on_death=self.enemy_kill)
+            if enemy_type == 2:
+                enemy = Enemy(pos=(randint(0, 4000 - 67), randint(0, 2500 - 32)), size=2.5, speed=3, w=32, h=64, delay=100,
+                              player=self.player, health=500, damage=15, sheet=shield_skeleton, exp=randint(200, 400)*self.enemy_wave, on_death=self.enemy_kill)
+
         self.living_enemies = self.enemies_per_wave
 
     def update(self):
@@ -62,6 +77,7 @@ class Game:
             self.update()
             pygame.display.update()
             self.clock.tick(FPS)
+
 
 game = Game()
 game.run()
