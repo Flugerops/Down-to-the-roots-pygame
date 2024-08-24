@@ -36,13 +36,18 @@ class UI:
         self.screen.blit(player_stats_surface, player_stats_rect)
     
         icon_size = 30
-        icon_x = 10
+        icon_x = 50
         icon_y = 100
         stats_x = icon_x + icon_size + 10
         stats_y = 100
         for i, (icon, stat) in enumerate(zip(self.stats_icons, [player.strength, player.agility, player.intelligence])):
             icon_rect = icon.get_rect(topleft=(icon_x, icon_y + i * (icon_size + 10)))
             self.screen.blit(icon, icon_rect)
+            
+            stat_num_surface = self.font.render(f"{i+1}", False, (255, 255, 255))
+            stat_num_rect = stat_num_surface.get_rect(topleft=(icon_x - 20, icon_y + i * (icon_size + 10)))
+            self.screen.blit(stat_num_surface, stat_num_rect)
+            
             stat_surface = self.font.render(f"{stat}", False, (255, 255, 255))
             stat_rect = stat_surface.get_rect(topleft=(stats_x, stats_y + i * (icon_size + 10)))
             self.screen.blit(stat_surface, stat_rect)
@@ -70,7 +75,7 @@ class UI:
         for i, icon in enumerate(ability_icons):
             icon_rect = icon.get_rect(center=(icon_x + i * (icon_size + icon_spacing), icon_y))
             self.screen.blit(icon, icon_rect)
-
+            
             cooldown = ability_сooldowns.get(ability_keys[i].lower())
             if cooldown > 0:
                 cooldown_seconds = int(cooldown / 60)

@@ -7,19 +7,20 @@ from .bullet import Bullet
 from .lightning import Lightning
 
 
-
 class Player(sprite.Sprite):
     def __init__(self, size: float, speed: float, w: int, h: int) -> None:
         super().__init__(all_sprites_group)
-        self.idle = Spritesheet(image.load("assets/player/Thin.png").convert_alpha(), 1, 300)
-        self.run = Spritesheet(image.load("assets/player/Run.png").convert_alpha(), 1, 50)
+        self.idle = Spritesheet(image.load(
+            "assets/player/Thin.png").convert_alpha(), 1, 300)
+        self.run = Spritesheet(image.load(
+            "assets/player/Run.png").convert_alpha(), 1, 50)
         self.w = w
         self.h = h
         self.size = size
         self.weapon_img = image.load("assets/weapons/2_1.png").convert()
         self.weapon_img = transform.rotozoom(self.weapon_img, 0, size)
-        self.weapon_img.set_colorkey((0,0,0))
-        self.image = self.idle.get_image(4, w, h, size, (0,0,0))
+        self.weapon_img.set_colorkey((0, 0, 0))
+        self.image = self.idle.get_image(4, w, h, size, (0, 0, 0))
         self.pos = Vector2(WIDTH, HEIGHT)
         self.speed = speed
         self.rect = self.image.get_rect(center=self.pos)
@@ -47,33 +48,34 @@ class Player(sprite.Sprite):
         self.bullet_sound = mixer.Sound("assets/sounds/bullet.mp3")
         self.bullet_sound.set_volume(0.2)
         self.hit_sound = mixer.Sound("assets/sounds/hit_sound.mp3")
-        
+        self.level_sound = mixer.Sound("assets/sounds/level_up.mp3")
+
     def move(self):
         keys = key.get_pressed()
         if keys[K_w]:
             if self.obstacle_check(0, -self.speed * self.speed_multiplayer):
                 self.velocity_y = -self.speed * self.speed_multiplayer
                 self.running = True
-            
+
         if keys[K_s]:
             if self.obstacle_check(0, self.speed * self.speed_multiplayer):
                 self.velocity_y = self.speed * self.speed_multiplayer
                 self.running = True
-            
+
         if keys[K_d]:
             if self.obstacle_check(self.speed * self.speed_multiplayer, 0):
                 self.velocity_x = self.speed * self.speed_multiplayer
                 self.running = True
                 if self.flipped:
                     self.flipped = False
-                
+
         if keys[K_a]:
             if self.obstacle_check(-self.speed * self.speed_multiplayer, 0):
                 self.velocity_x = -self.speed * self.speed_multiplayer
                 self.running = True
                 if not self.flipped:
                     self.flipped = True
-        
+
         if keys[K_1] and self.points_cooldown == 0:
             self.spend_skill_point("strength")
             self.points_cooldown = 30
@@ -83,33 +85,31 @@ class Player(sprite.Sprite):
         if keys[K_3] and self.points_cooldown == 0:
             self.spend_skill_point("intelligence")
             self.points_cooldown = 30
-        
+
         if keys[K_q] and self.ability_cooldowns.get("q") == 0:
             self.use_ability("q")
-        
+
         if keys[K_e] and self.ability_cooldowns.get("e") == 0:
             self.use_ability("e")
-        
+
         if keys[K_r] and self.ability_cooldowns.get("r") == 0:
             self.use_ability("r")
-            
-            
-        
+
         if not all([keys[K_a] or keys[K_d] or keys[K_s] or keys[K_w]]):
             self.running = False
-            
+
         if mouse.get_pressed() == (True, False, False):
             self.shoot = True
             self.shooting()
         else:
             self.shoot = False
-            
+
         if self.velocity_x != 0 and self.velocity_y != 0:
             self.velocity_x /= sqrt(2)
             self.velocity_y /= sqrt(2)
-         
+
         self.pos += Vector2(self.velocity_x, self.velocity_y)
-        
+
         if self.pos.x < 0:
             self.pos.x = 0
         elif self.pos.x > 4000 - self.w:
@@ -118,10 +118,9 @@ class Player(sprite.Sprite):
             self.pos.y = 0
         elif self.pos.y > 2500 - self.h:
             self.pos.y = 2500 - self.h
-            
+
         self.rect.center = self.pos
 
-        
     def handle_weapons(self, screen):
         self.get_mouse_pos()
         if self.angle < -90 or self.angle > 90:
@@ -131,10 +130,12 @@ class Player(sprite.Sprite):
             weapon_copy = transform.rotate(self.weapon_img, -self.angle)
         offset_x = self.rect.centerx - WIDTH // 2 + 10
         offset_y = self.rect.centery - HEIGHT // 2 + 5
-        screen.blit(weapon_copy, (self.rect.centerx - offset_x, self.rect.centery - offset_y))
-    
+        screen.blit(weapon_copy, (self.rect.centerx -
+                    offset_x, self.rect.centery - offset_y))
+
     def level_up(self):
         self.level += 1
+        self.level_sound.play()
         self.experience = 0
         self.skill_points += 1
 
@@ -142,15 +143,16 @@ class Player(sprite.Sprite):
         self.experience += amount
         if self.experience >= self.exp_to_next_level:
             self.level_up()
-            self.exp_to_next_level *= 1.5
-    
+            self.exp_to_next_level *= 2
+
     def use_ability(self, key):
         match key:
             case "q":
                 num_bullets = self.intelligence * 2 + 5
                 for i in range(num_bullets):
                     angle = self.angle + randint(-10, 10)
-                    bullet = Bullet(self.rect.centerx, self.rect.centery, 50, angle, 500, damage=self.damage)
+                    bullet = Bullet(
+                        self.rect.centerx, self.rect.centery, 50, angle, 500, damage=self.damage)
                     bullet_group.add(bullet)
                     all_sprites_group.add(bullet)
                     self.bullet_sound.play()
@@ -162,20 +164,20 @@ class Player(sprite.Sprite):
                 self.lightning = Lightning(mouse_x, mouse_y, self.intelligence)
                 lightning_group.add(self.lightning)
                 all_sprites_group.add(self.lightning)
-                lightning_sound = mixer.Sound("assets/sounds/lightning_strike.mp3")
+                lightning_sound = mixer.Sound(
+                    "assets/sounds/lightning_strike.mp3")
                 lightning_sound.play()
                 self.ability_cooldowns[key] = 3600
             case "e":
                 heal_amount = self.intelligence * 5 + 10
                 if self.health + heal_amount <= self.max_health:
-                    self.health += heal_amount
+                    self.health = round(self.health + heal_amount)
                 else:
                     self.health = self.max_health
                 healsound = mixer.Sound("assets/sounds/healpop.mp3")
                 healsound.play()
                 self.ability_cooldowns[key] = 1800
 
-    
     def spend_skill_point(self, attribute):
         if self.skill_points > 0:
             match attribute:
@@ -186,7 +188,7 @@ class Player(sprite.Sprite):
                         self.health = self.max_health
                     else:
                         self.max_health += 10
-                    
+
                 case "agility":
                     self.agility += 1
                     self.damage += 2
@@ -194,15 +196,15 @@ class Player(sprite.Sprite):
                 case "intelligence":
                     self.intelligence += 1
             self.skill_points -= 1
-    
+
     def get_damage(self, amount):
         if self.damage_cooldown == 0:
-            self.health -= amount
+            self.health = round(self.health - amount)
             if self.health <= 0:
                 self.dead = True
             self.damage_cooldown = 20
             self.hit_sound.play()
-    
+
     def obstacle_check(self, dx, dy):
         new_pos = self.pos + Vector2(dx, dy)
         for sprite in obstacles:
@@ -210,7 +212,7 @@ class Player(sprite.Sprite):
                 self.pos -= Vector2(dx, dy)
                 return False
         return True
-            
+
     def get_mouse_pos(self):
         self.mouse_coords = mouse.get_pos()
         self.x_changed_mouse = (self.mouse_coords[0] - WIDTH // 2)
@@ -222,25 +224,30 @@ class Player(sprite.Sprite):
             self.shoot_cooldown = 20
             bullet_pos = self.pos
             self.get_mouse_pos()
-            self.bullet = Bullet(bullet_pos[0], bullet_pos[1], 50, self.angle, 500, damage=self.damage)
+            self.bullet = Bullet(
+                bullet_pos[0], bullet_pos[1], 50, self.angle, 500, damage=self.damage)
             self.bullet_sound.play()
             bullet_group.add(self.bullet)
             all_sprites_group.add(self.bullet)
-            
+
     def update(self):
         if self.running:
             if self.flipped:
-                self.image = transform.flip(self.run.play_animation(self.w, self.h, self.size, (0, 0, 0)), True, False)
-                self.image.set_colorkey((0, 0, 0))
-            else: 
-                self.image = self.run.play_animation(self.w, self.h, self.size, (0, 0, 0))
-        else:
-            if self.flipped:
-                self.image = transform.flip(self.idle.play_animation(self.w, self.h, self.size, (0, 0, 0)), True, False)
+                self.image = transform.flip(self.run.play_animation(
+                    self.w, self.h, self.size, (0, 0, 0)), True, False)
                 self.image.set_colorkey((0, 0, 0))
             else:
-                self.image = self.idle.play_animation(self.w, self.h, self.size, (0, 0, 0))
-                
+                self.image = self.run.play_animation(
+                    self.w, self.h, self.size, (0, 0, 0))
+        else:
+            if self.flipped:
+                self.image = transform.flip(self.idle.play_animation(
+                    self.w, self.h, self.size, (0, 0, 0)), True, False)
+                self.image.set_colorkey((0, 0, 0))
+            else:
+                self.image = self.idle.play_animation(
+                    self.w, self.h, self.size, (0, 0, 0))
+
         self.move()
         if self.shoot_cooldown > 0:
             self.shoot_cooldown -= 1
@@ -250,7 +257,7 @@ class Player(sprite.Sprite):
             self.points_cooldown -= 1
         if self.damage_cooldown > 0:
             self.damage_cooldown -= 1
-            
+
         for key in self.ability_cooldowns:
             if self.ability_cooldowns[key] > 0:
                 self.ability_cooldowns[key] -= 1

@@ -38,8 +38,8 @@ class Game:
         self.background_music.set_volume(0.2)
         self.wave_sound = pygame.mixer.Sound("assets/sounds/new_wave.mp3")
 
-    def enemy_kill(enemy):
-        game.living_enemies -= 1
+    def enemy_kill(self):
+        self.living_enemies -= 1
 
     def spawn_enemies(self):
         hound_image = pygame.image.load("assets/enemies/hound_run.png")
@@ -50,14 +50,14 @@ class Game:
         for i in range(self.enemies_per_wave):
             enemy_type = randint(0, 2)
             if enemy_type == 0:
-                enemy = Enemy(pos=(randint(0, 4000 - 67), randint(0, 2500 - 32)), size=2.5, speed=5, w=67, h=32, delay=50,
-                              player=self.player, health=100, damage=20, sheet=hound_image, exp=randint(20, 80)*self.enemy_wave, on_death=self.enemy_kill)
+                enemy = Enemy(pos=(randint(0, 4000 - 67), randint(0, 2500 - 32)), size=2.5, speed=7, w=67, h=32, delay=50,
+                              player=self.player, health=50, damage=20, sheet=hound_image, exp=randint(20, 80)*self.enemy_wave, on_death=self.enemy_kill)
             if enemy_type == 1:
-                enemy = Enemy(pos=(randint(0, 4000 - 67), randint(0, 2500 - 32)), size=2.5, speed=3, w=75, h=64, delay=100,
+                enemy = Enemy(pos=(randint(0, 4000 - 67), randint(0, 2500 - 32)), size=2.5, speed=5, w=75, h=64, delay=100,
                               player=self.player, health=250, damage=50, sheet=armored_skeleton, exp=randint(100, 300)*self.enemy_wave, on_death=self.enemy_kill)
             if enemy_type == 2:
                 enemy = Enemy(pos=(randint(0, 4000 - 67), randint(0, 2500 - 32)), size=2.5, speed=3, w=32, h=64, delay=100,
-                              player=self.player, health=500, damage=15, sheet=shield_skeleton, exp=randint(200, 400)*self.enemy_wave, on_death=self.enemy_kill)
+                              player=self.player, health=500, damage=35, sheet=shield_skeleton, exp=randint(200, 400)*self.enemy_wave, on_death=self.enemy_kill)
 
         self.living_enemies = self.enemies_per_wave
 
@@ -105,5 +105,4 @@ class Game:
             self.clock.tick(FPS)
 
 
-game = Game()
-game.run()
+
