@@ -1,6 +1,6 @@
-from math import sqrt, degrees, atan2, pi
+from math import sqrt, degrees, atan2
 from random import randint
-from pygame import sprite, image, Vector2, transform, key, K_w, K_s, K_d, K_a, K_1, K_2, K_3, K_q, K_r, K_e, Rect, mouse, mask, KEYUP, draw, mixer
+from pygame import sprite, image, Vector2, transform, key, K_w, K_s, K_d, K_a, K_1, K_2, K_3, K_q, K_r, K_e, mouse, KEYUP, mixer
 from settings import WIDTH, HEIGHT
 from layer import Spritesheet, bullet_group, all_sprites_group, obstacles, lightning_group
 from .bullet import Bullet
@@ -8,6 +8,9 @@ from .lightning import Lightning
 
 
 class Player(sprite.Sprite):
+    """Player class 
+    """
+
     def __init__(self, size: float, speed: float, w: int, h: int) -> None:
         super().__init__(all_sprites_group)
         self.idle = Spritesheet(image.load(
@@ -50,7 +53,9 @@ class Player(sprite.Sprite):
         self.hit_sound = mixer.Sound("assets/sounds/hit_sound.mp3")
         self.level_sound = mixer.Sound("assets/sounds/level_up.mp3")
 
-    def move(self):
+    def move(self) -> None:
+        """Player movement handler
+        """
         keys = key.get_pressed()
         if keys[K_w]:
             if self.obstacle_check(0, -self.speed * self.speed_multiplayer):
@@ -121,7 +126,9 @@ class Player(sprite.Sprite):
 
         self.rect.center = self.pos
 
-    def handle_weapons(self, screen):
+    def handle_weapons(self, screen) -> None:
+        """Weapons handle
+        """
         self.get_mouse_pos()
         if self.angle < -90 or self.angle > 90:
             weapon_copy = transform.flip(self.weapon_img, False, True)
@@ -133,23 +140,23 @@ class Player(sprite.Sprite):
         screen.blit(weapon_copy, (self.rect.centerx -
                     offset_x, self.rect.centery - offset_y))
 
-    def level_up(self):
+    def level_up(self) -> None:
         self.level += 1
         self.level_sound.play()
         self.experience = 0
         self.skill_points += 1
 
-    def gain_exp(self, amount):
+    def gain_exp(self, amount: int) -> None:
         self.experience += amount
         if self.experience >= self.exp_to_next_level:
             self.level_up()
             self.exp_to_next_level *= 2
 
-    def use_ability(self, key):
+    def use_ability(self, key: str) -> None:
         match key:
             case "q":
                 num_bullets = self.intelligence * 2 + 5
-                for i in range(num_bullets):
+                for _ in range(num_bullets):
                     angle = self.angle + randint(-10, 10)
                     bullet = Bullet(
                         self.rect.centerx, self.rect.centery, 50, angle, 500, damage=self.damage)
@@ -178,7 +185,7 @@ class Player(sprite.Sprite):
                 healsound.play()
                 self.ability_cooldowns[key] = 1800
 
-    def spend_skill_point(self, attribute):
+    def spend_skill_point(self, attribute: str) -> None:
         if self.skill_points > 0:
             match attribute:
                 case "strength":
@@ -206,6 +213,8 @@ class Player(sprite.Sprite):
             self.hit_sound.play()
 
     def obstacle_check(self, dx, dy):
+        """Check for an obstacle ahead
+        """
         new_pos = self.pos + Vector2(dx, dy)
         for sprite in obstacles:
             if new_pos.x + self.w > sprite.hitbox.left and new_pos.x < sprite.hitbox.right and new_pos.y + self.h > sprite.hitbox.top and new_pos.y < sprite.hitbox.bottom:
@@ -231,6 +240,8 @@ class Player(sprite.Sprite):
             all_sprites_group.add(self.bullet)
 
     def update(self):
+        """Update screen and events
+        """
         if self.running:
             if self.flipped:
                 self.image = transform.flip(self.run.play_animation(

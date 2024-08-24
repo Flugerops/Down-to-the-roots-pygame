@@ -11,12 +11,16 @@ obstacles = Group()
 
 
 class SpriteGenerator:
+    """Random sprites positions generator class
+    """
     def __init__(self, image, quantity) -> None:
         self.image = image
         self.quantity = quantity
         
     def generate_sprites(self):
-        for i in range(self.quantity):
+        """Generate random sprite positions
+        """
+        for _ in range(self.quantity):
             x = randint(0, 4000 - self.image.get_width())
             y = randint(0, 2500 - self.image.get_height())
             sprite = Sprite(obstacles)

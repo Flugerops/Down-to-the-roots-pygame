@@ -1,9 +1,12 @@
-from pygame import sprite, image, Vector2, transform, mixer
+from pygame import sprite, Vector2, transform
 from layer import all_sprites_group, enemy_group, Spritesheet, obstacles
 
 
 class Enemy(sprite.Sprite):
-    def __init__(self, pos, size: float, speed: float, w: int, h: int, sheet, delay, health, damage, player, exp, on_death=None) -> None:
+    """Enemy entity class
+    """
+
+    def __init__(self, pos, size: float, speed: float, w: int, h: int, sheet, delay: int, health: int, damage: int, player, exp: int, on_death=None) -> None:
         super().__init__(all_sprites_group, enemy_group)
         self.enemy_sprite = Spritesheet(sheet, 1, delay)
         self.image = self.enemy_sprite.get_image(1, w, h, size, (0, 0, 0))
@@ -26,6 +29,11 @@ class Enemy(sprite.Sprite):
         self.colliding = False
 
     def chase_player(self, player):
+        """Simple AI to chase player
+
+        Args:
+            player (Player): player instance
+        """
         self.colliding = False
         player_vector = Vector2(player.rect.center)
         enemy_vector = Vector2(self.rect.center)
@@ -43,7 +51,6 @@ class Enemy(sprite.Sprite):
                 self.velocity = avoid_direction * self.speed
                 self.colliding = True
                 break
-        
         if self.rect.colliderect(player.rect):
             player.get_damage(self.damage)
             self.velocity = -self.velocity * 5
@@ -55,7 +62,12 @@ class Enemy(sprite.Sprite):
         self.rect.centerx = self.position.x
         self.rect.centery = self.position.y
 
-    def get_damage(self, amount):
+    def get_damage(self, amount: int):
+        """Geting damage handler
+
+        Args:
+            amount (int): amoun of damage
+        """
         self.health -= amount
         if self.health <= 0:
             self.alive = False
@@ -64,17 +76,20 @@ class Enemy(sprite.Sprite):
             self.player.gain_exp(self.exp)
 
     def avoid_obstacle(self, obstacle):
+        """Avoiding obstacles on the way
+        """
         avoid_direction = (self.position - obstacle.hitbox.center).normalize()
         self.velocity += avoid_direction * (self.speed / 2)
         return avoid_direction
-
 
     @staticmethod
     def vec_dist(vector1, vector2):
         return (vector1 - vector2).magnitude()
 
     def update(self):
-
+        """
+        Update screen and events
+        """
         if not self.colliding:
             if self.velocity.x < 0 and not self.flipped:
                 self.flipped = True
