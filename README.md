@@ -9,10 +9,11 @@ First you need to `clone` project </br>
 Then go to the project folder and install pygame </br>
 Make a virtual enviroment</br>
 ```
-python -m venv .venv
 For windows:
+python -m venv .venv
 .venv\Scripts\activate.ps1
 For linux:
+python3 -m venv .venv
 source .venv/bin/activate
 ```
 Then install pygame
