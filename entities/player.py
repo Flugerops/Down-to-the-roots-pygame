@@ -45,7 +45,7 @@ class Player(sprite.Sprite):
         self.damage_cooldown = 0
         self.dead = False
         self.bullet_sound = mixer.Sound("assets/sounds/bullet.mp3")
-        self.bullet_sound.set_volume(0.3)
+        self.bullet_sound.set_volume(0.2)
         self.hit_sound = mixer.Sound("assets/sounds/hit_sound.mp3")
         
     def move(self):

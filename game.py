@@ -35,7 +35,7 @@ class Game:
         self.running = True
         self.background_music = pygame.mixer.Sound("assets/sounds/background_music.mp3")
         self.background_music.play(-1)
-        self.background_music.set_volume(0.3)
+        self.background_music.set_volume(0.2)
         self.wave_sound = pygame.mixer.Sound("assets/sounds/new_wave.mp3")
 
     def enemy_kill(enemy):

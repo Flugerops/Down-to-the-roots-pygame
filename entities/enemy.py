@@ -22,8 +22,11 @@ class Enemy(sprite.Sprite):
         self.speed = speed
         self.on_death = on_death
         self.position = Vector2(pos)
+        self.avoid_cooldown = 0
+        self.colliding = False
 
     def chase_player(self, player):
+        self.colliding = False
         player_vector = Vector2(player.rect.center)
         enemy_vector = Vector2(self.rect.center)
         distance = self.vec_dist(player_vector, enemy_vector)
@@ -38,8 +41,9 @@ class Enemy(sprite.Sprite):
             if self.rect.colliderect(obstacle.hitbox):
                 avoid_direction = self.avoid_obstacle(obstacle)
                 self.velocity = avoid_direction * self.speed
+                self.colliding = True
                 break
-
+        
         if self.rect.colliderect(player.rect):
             player.get_damage(self.damage)
             self.velocity = -self.velocity * 5
@@ -64,16 +68,18 @@ class Enemy(sprite.Sprite):
         self.velocity += avoid_direction * (self.speed / 2)
         return avoid_direction
 
+
     @staticmethod
     def vec_dist(vector1, vector2):
         return (vector1 - vector2).magnitude()
 
     def update(self):
 
-        if self.velocity.x < 0 and not self.flipped:
-            self.flipped = True
-        elif self.velocity.x > 0 and self.flipped:
-            self.flipped = False
+        if not self.colliding:
+            if self.velocity.x < 0 and not self.flipped:
+                self.flipped = True
+            elif self.velocity.x > 0 and self.flipped:
+                self.flipped = False
 
         self.image = self.enemy_sprite.play_animation(
             self.w, self.h, self.size, (0, 0, 0))
