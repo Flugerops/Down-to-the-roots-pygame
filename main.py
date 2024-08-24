@@ -21,7 +21,6 @@ class Main:
         current_state = "menu"
         while True:
             if current_state == "menu":
-                # self.game.background_music.stop()
                 self.menu.update()
                 display.update()
                 result = self.menu.handle_events()
@@ -33,7 +32,6 @@ class Main:
 
             elif current_state == "game":
                 self.game = Game()
-                self.game.background_music.play()
                 self.game.run()
                 if self.game.show_menu:
                     current_state = "menu"
