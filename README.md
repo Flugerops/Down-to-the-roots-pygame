@@ -18,7 +18,7 @@ source .venv/bin/activate
 ```
 Then install pygame
 ```pip install pygame``` </br>
-Write your screen resolution in settings.py
+Write your screen resolution in settings.py</br>
 Run a game
 ```python main.py```</br>
 And play!
